@@ -42,41 +42,7 @@ jobs:
             echo "version=${REF#v}" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Import Developer ID certificate
-        if: ${{ secrets.APPLE_CERT_P12_BASE64 != '' }}
-        env:
-          CERT_B64: ${{ secrets.APPLE_CERT_P12_BASE64 }}
-          CERT_PW: ${{ secrets.APPLE_CERT_PASSWORD }}
-        run: |
-          CERT_PATH="$RUNNER_TEMP/cert.p12"
-          KEYCHAIN_PATH="$RUNNER_TEMP/app-signing.keychain-db"
-          KEYCHAIN_PW="$(openssl rand -base64 24)"
-
-          echo -n "$CERT_B64" | base64 --decode -o "$CERT_PATH"
-
-          security create-keychain -p "$KEYCHAIN_PW" "$KEYCHAIN_PATH"
-          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
-          security unlock-keychain -p "$KEYCHAIN_PW" "$KEYCHAIN_PATH"
-          security import "$CERT_PATH" -P "$CERT_PW" -A \
-              -t cert -f pkcs12 -k "$KEYCHAIN_PATH" \
-              -T /usr/bin/codesign -T /usr/bin/productbuild
-          security set-key-partition-list \
-              -S apple-tool:,apple:,codesign: \
-              -s -k "$KEYCHAIN_PW" "$KEYCHAIN_PATH"
-          security list-keychains -d user -s "$KEYCHAIN_PATH" \
-              $(security list-keychains -d user | sed -e 's/"//g')
-
-          IDENTITY=$(security find-identity -v -p codesigning "$KEYCHAIN_PATH" \
-              | grep "Developer ID Application" | head -1 \
-              | sed -E 's/.*"([^"]+)".*/\1/')
-          echo "APPLE_SIGNING_IDENTITY=$IDENTITY" >> "$GITHUB_ENV"
-          echo "Using identity: $IDENTITY"
-
-      - name: Build, sign, notarize, package DMG
-        env:
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+      - name: Build DMG (unsigned)
         run: scripts/build-release.sh "${{ steps.version.outputs.version }}"
 
       - name: Upload artifact

@@ -81,7 +81,27 @@ scripts/build-release.sh 0.1.0
 # output: build/Spoonlift-0.1.0.dmg
 ```
 
-The app is **ad-hoc signed** — end-users will see a Gatekeeper warning on first launch and need to right-click → **Open**. Apple Developer ID signing + notarization is on the roadmap.
+Releases are currently **unsigned**, so users see a one-time *"unidentified developer"* Gatekeeper prompt on first launch (right-click → Open bypasses it). Code signing + notarization with an Apple Developer ID is on the roadmap but not wired up.
+
+### Optional: signed releases
+
+If you fork this project and have access to an Apple Developer ID Application certificate, `scripts/build-release.sh` already supports signing + notarization — it flips on automatically when the right env vars are set. To enable it in CI, add an Import-cert step to `.github/workflows/release.yml` and set these 5 repository secrets (Settings → Secrets and variables → Actions):
+
+| Secret | Value |
+|--------|-------|
+| `APPLE_CERT_P12_BASE64` | Your **Developer ID Application** certificate + private key, exported as a `.p12` from Keychain Access, then base64-encoded: `base64 -i DeveloperID.p12 \| pbcopy` |
+| `APPLE_CERT_PASSWORD`   | The password you set when exporting the `.p12` |
+| `APPLE_ID`              | Apple ID email attached to your developer account |
+| `APPLE_TEAM_ID`         | 10-character Team ID from [developer.apple.com](https://developer.apple.com/account) → Membership |
+| `APPLE_APP_PASSWORD`    | App-specific password created at [appleid.apple.com](https://appleid.apple.com) → Sign-In and Security → App-Specific Passwords |
+
+Exporting the `.p12` from Keychain Access:
+1. Keychain Access → **login** keychain → **My Certificates**.
+2. Find **Developer ID Application: *Your Name* (TEAMID)**.
+3. Right-click → **Export…** → Format: **Personal Information Exchange (.p12)**.
+4. Set a password (this is `APPLE_CERT_PASSWORD`). Save as `DeveloperID.p12`.
+5. `base64 -i DeveloperID.p12 | pbcopy` → paste into `APPLE_CERT_P12_BASE64`.
+6. Delete the local `.p12` when done.
 
 ## License
 
