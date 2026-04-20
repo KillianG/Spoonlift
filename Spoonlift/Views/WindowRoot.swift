@@ -22,6 +22,18 @@ struct WindowRoot: View {
             .environmentObject(window)
             .environmentObject(window.transfers)
         }
+        .alert(
+            window.transfers.errorNotice?.title ?? "",
+            isPresented: Binding(
+                get: { window.transfers.errorNotice != nil },
+                set: { if !$0 { window.transfers.errorNotice = nil } }
+            ),
+            presenting: window.transfers.errorNotice
+        ) { _ in
+            Button("OK", role: .cancel) { window.transfers.errorNotice = nil }
+        } message: { notice in
+            Text(notice.message)
+        }
         .overlay(alignment: .bottom) {
             TransferProgressOverlay()
         }

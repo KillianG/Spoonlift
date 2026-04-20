@@ -75,12 +75,6 @@ struct FileListView: View {
         } primaryAction: { selection in
             openPrimary(selection)
         }
-        .background {
-            Button("", action: trashSelected)
-                .keyboardShortcut(.delete, modifiers: [.command])
-                .opacity(0)
-                .frame(width: 0, height: 0)
-        }
     }
 
     private func openPrimary(_ selection: Set<URL>) {
@@ -91,28 +85,6 @@ struct FileListView: View {
         } else {
             NSWorkspace.shared.open(url)
         }
-    }
-
-    private func trashSelected() {
-        guard !tab.selection.isEmpty else { return }
-        let results = FileSystemService.moveToTrash(Array(tab.selection))
-        let restorable: [(URL, URL)] = results.compactMap { (original, trashed) in
-            guard let trashed else { return nil }
-            return (original, trashed)
-        }
-        if !restorable.isEmpty {
-            undoManager?.registerUndo(withTarget: tab) { t in
-                MainActor.assumeIsolated {
-                    for (original, trashed) in restorable {
-                        try? FileManager.default.moveItem(at: trashed, to: original)
-                    }
-                    t.reload()
-                }
-            }
-            undoManager?.setActionName("Move to Trash")
-        }
-        tab.selection.removeAll()
-        tab.reload()
     }
 
     private static let dateFormatter: DateFormatter = {

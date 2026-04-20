@@ -2,19 +2,32 @@
 # SPDX-License-Identifier: MIT
 #
 # Fetch the DMG for a given version from GitHub Releases, compute its SHA256,
-# and rewrite homebrew/spoonlift.rb so it's ready to be copied into a
-# homebrew-cask PR.
+# rewrite homebrew-tap/Casks/spoonlift.rb, and push the update to the tap
+# repo so users get it with `brew upgrade --cask spoonlift`.
 #
-# Usage: scripts/update-cask.sh [version]
+# Usage: scripts/update-cask.sh [version] [--no-push]
 # Default version: the newest release tag on GitHub.
+# --no-push: update the cask file locally but skip the git commit/push step.
 
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-CASK_FILE="${ROOT_DIR}/homebrew/spoonlift.rb"
-REPO="KillianG/open-forklift"
+TAP_DIR="${ROOT_DIR}/homebrew-tap"
+CASK_FILE="${TAP_DIR}/Casks/spoonlift.rb"
+REPO="KillianG/Spoonlift"
 
-VERSION="${1:-}"
+PUSH=1
+VERSION=""
+for arg in "$@"; do
+    case "$arg" in
+        --no-push) PUSH=0 ;;
+        -h|--help)
+            sed -n '2,9p' "$0" | sed 's/^# \{0,1\}//'
+            exit 0 ;;
+        *) VERSION="$arg" ;;
+    esac
+done
+
 if [[ -z "${VERSION}" ]]; then
     if ! command -v gh >/dev/null; then
         echo "No version given and gh not installed. Either run:" >&2
@@ -41,12 +54,41 @@ echo "▸ SHA256: ${SHA256}"
 /usr/bin/sed -i '' -E "s|^(  sha256 \")[^\"]+(\")|\1${SHA256}\2|" "${CASK_FILE}"
 
 echo "✓ Updated ${CASK_FILE}"
-echo
-echo "Next steps to push this to homebrew-cask:"
-echo "  1. Fork https://github.com/Homebrew/homebrew-cask"
-echo "  2. git clone your fork, cd into it, branch off main"
-echo "  3. cp ${CASK_FILE} Casks/s/spoonlift.rb"
-echo "  4. brew style --fix Casks/s/spoonlift.rb"
-echo "  5. brew audit --new-cask spoonlift"
-echo "  6. git commit -m 'Add spoonlift v${VERSION}' && git push"
-echo "  7. Open a PR to Homebrew/homebrew-cask"
+
+if [[ "${PUSH}" == "0" ]]; then
+    echo "ℹ --no-push: skipping git commit. Push manually when ready."
+    exit 0
+fi
+
+# The tap directory must be a git repo with its own remote (the
+# KillianG/homebrew-tap GitHub repo) — not a subdirectory of this project's git.
+if [[ ! -d "${TAP_DIR}/.git" ]]; then
+    echo
+    echo "ℹ ${TAP_DIR} isn't a git repository yet. Initialise it once with:"
+    echo "  cd homebrew-tap"
+    echo "  git init && git branch -M main"
+    echo "  git add . && git commit -m 'Initial tap: Spoonlift ${VERSION}'"
+    echo "  git remote add origin git@github.com:KillianG/homebrew-tap.git"
+    echo "  git push -u origin main"
+    echo "Then re-run this script to push future updates automatically."
+    exit 0
+fi
+
+cd "${TAP_DIR}"
+
+if git diff --quiet -- Casks/spoonlift.rb; then
+    echo "ℹ No change to Casks/spoonlift.rb — cask already at ${VERSION} with this SHA256."
+    exit 0
+fi
+
+echo "▸ Committing update to tap repo"
+git add Casks/spoonlift.rb
+git commit -m "Update Spoonlift to ${VERSION}"
+
+if git remote | grep -q .; then
+    echo "▸ Pushing to $(git remote get-url origin 2>/dev/null || echo 'remote')"
+    git push
+    echo "✓ Cask pushed. Users upgrade with: brew update && brew upgrade --cask spoonlift"
+else
+    echo "ℹ No git remote configured in the tap repo. Commit made locally; add a remote and push when ready."
+fi

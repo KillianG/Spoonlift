@@ -20,13 +20,34 @@ struct TabContentView: View {
     @State private var isNewFolderPresented: Bool = false
     @State private var newFolderName: String = ""
 
+    /// True when this tab is the active tab of the active pane in the window.
+    /// Notifications are broadcast app-wide; only the active tab should act on them.
+    private var isActive: Bool {
+        window.activePaneID == pane.id && pane.activeTabID == tab.id
+    }
+
     var body: some View {
         mainStack
             .onAppear { tab.reload() }
             .sheet(item: $renameTarget, content: renameSheet)
             .sheet(item: $infoTarget, content: infoSheet)
             .sheet(isPresented: $isNewFolderPresented, content: newFolderSheet)
-            .background(shortcutButtons)
+            .modifier(TabShortcutListener(isActive: isActive, handler: handleShortcut))
+    }
+
+    private func handleShortcut(_ name: Notification.Name) {
+        switch name {
+        case .spoonliftCopy:       copySelected()
+        case .spoonliftCut:        cutSelected()
+        case .spoonliftPaste:      pasteItems()
+        case .spoonliftDuplicate:  duplicateSelected()
+        case .spoonliftCopyPath:   copyPathSelected()
+        case .spoonliftTrash:      trashSelected()
+        case .spoonliftGetInfo:    getInfoSelected()
+        case .spoonliftNewFolder:  beginNewFolder()
+        case .spoonliftQuickLook:  quickLookSelected()
+        default: break
+        }
     }
 
     private var mainStack: some View {
@@ -135,26 +156,6 @@ struct TabContentView: View {
         )
     }
 
-    @ViewBuilder
-    private var shortcutButtons: some View {
-        ZStack {
-            Button("", action: quickLookSelected).keyboardShortcut(.space, modifiers: [])
-            Button("", action: copySelected).keyboardShortcut("c", modifiers: [.command])
-            Button("", action: cutSelected).keyboardShortcut("x", modifiers: [.command])
-            Button("", action: pasteItems).keyboardShortcut("v", modifiers: [.command])
-            Button("", action: duplicateSelected).keyboardShortcut("d", modifiers: [.command])
-            Button("", action: getInfoSelected).keyboardShortcut("i", modifiers: [.command])
-            Button("", action: beginNewFolder).keyboardShortcut("n", modifiers: [.command, .shift])
-            Button("", action: copyPathSelected).keyboardShortcut("c", modifiers: [.command, .option])
-        }
-        .opacity(0)
-        .frame(width: 0, height: 0)
-    }
-
-    private func quickLookSelected() {
-        QuickLookCoordinator.shared.toggle(urls: Array(tab.selection))
-    }
-
     private func beginRename(_ item: FileItem) {
         renameText = item.name
         renameTarget = item
@@ -200,12 +201,51 @@ struct TabContentView: View {
     private func getInfoSelected() {
         if let first = tab.selection.first {
             infoTarget = InfoTargetWrapper(url: first)
+        } else {
+            infoTarget = InfoTargetWrapper(url: tab.currentURL)
         }
     }
 
     private func copyPathSelected() {
         let urls = tab.selection.isEmpty ? [tab.currentURL] : Array(tab.selection)
         Pasteboard.copyPath(urls)
+    }
+
+    private func trashSelected() {
+        guard !tab.selection.isEmpty else { return }
+        let urls = Array(tab.selection)
+        let results = FileSystemService.moveToTrash(urls)
+        let restorable: [(URL, URL)] = results.compactMap { (original, trashed) in
+            guard let trashed else { return nil }
+            return (original, trashed)
+        }
+        let failures = urls.filter { results[$0] == nil || results[$0] == .some(nil) }
+
+        if !restorable.isEmpty {
+            undoManager?.registerUndo(withTarget: tab) { t in
+                MainActor.assumeIsolated {
+                    for (original, trashed) in restorable {
+                        try? FileManager.default.moveItem(at: trashed, to: original)
+                    }
+                    t.reload()
+                }
+            }
+            undoManager?.setActionName("Move to Trash")
+        }
+
+        if !failures.isEmpty {
+            window.transfers.reportError(
+                title: "Couldn't move \(failures.count) item\(failures.count == 1 ? "" : "s") to the Trash",
+                message: "macOS blocked the operation. Grant Spoonlift Full Disk Access: System Settings → Privacy & Security → Full Disk Access → + → /Applications/Spoonlift.app."
+            )
+        }
+
+        tab.selection.removeAll()
+        tab.reload()
+    }
+
+    private func quickLookSelected() {
+        QuickLookCoordinator.shared.toggle(urls: Array(tab.selection))
     }
 
     private func handleDrop(urls: [URL]) {

@@ -25,8 +25,19 @@ final class TransferCoordinator: ObservableObject {
         let resume: (ConflictResolution) -> Void
     }
 
+    struct ErrorNotice: Identifiable {
+        let id = UUID()
+        let title: String
+        let message: String
+    }
+
     @Published var transfers: [Transfer] = []
     @Published var pendingConflict: PendingConflict?
+    @Published var errorNotice: ErrorNotice?
+
+    func reportError(title: String, message: String) {
+        errorNotice = ErrorNotice(title: title, message: message)
+    }
 
     var isActive: Bool {
         transfers.contains { !$0.finished }
@@ -79,6 +90,15 @@ final class TransferCoordinator: ObservableObject {
             transfers[idx].completedItems += 1
         case .finished, .cancelled:
             transfers[idx].finished = true
+            if !transfers[idx].errors.isEmpty {
+                let failed = transfers[idx].errors
+                let first = failed.first
+                reportError(
+                    title: "Transfer finished with \(failed.count) error\(failed.count == 1 ? "" : "s")",
+                    message: "First failure: \(first?.0.lastPathComponent ?? "?") — \(first?.1 ?? "?"). " +
+                             "If this is a permissions error, grant Spoonlift Full Disk Access in System Settings → Privacy & Security."
+                )
+            }
             scheduleCleanup(id: transferID)
         }
     }
