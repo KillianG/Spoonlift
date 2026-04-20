@@ -6,7 +6,7 @@
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-6455D3.svg"/></a>
   <img alt="Platform" src="https://img.shields.io/badge/Platform-macOS%2014%2B-4636B8"/>
   <img alt="Swift" src="https://img.shields.io/badge/Swift-5.9-orange"/>
-  <a href="../../releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/your-github-username/spoonlift?color=FFC857"/></a>
+  <a href="../../releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/KillianG/open-forklift?color=FFC857"/></a>
 </p>
 
 **Spoonlift** is a native macOS file manager heavily inspired by Forklift — dual-pane browsing, tabs, four view modes, Finder tags, Quick Look, drag-drop transfers with progress. Built in SwiftUI. Fully open source. MIT licensed.
@@ -50,7 +50,7 @@ Great for contributors or anyone who wants the bleeding edge.
 - [xcodegen](https://github.com/yonaskolb/XcodeGen) (`brew install xcodegen`)
 
 ```bash
-git clone https://github.com/your-github-username/spoonlift.git
+git clone https://github.com/KillianG/open-forklift.git
 cd spoonlift
 xcodegen                    # generates Spoonlift.xcodeproj from project.yml
 open Spoonlift.xcodeproj
