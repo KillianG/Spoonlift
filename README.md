@@ -33,12 +33,12 @@
 ### Download the DMG
 
 1. Grab the latest `Spoonlift-x.y.z.dmg` from the [Releases page](../../releases/latest).
-2. Open it and drag **Spoonlift** to `Applications`.
-3. First launch: the app is ad-hoc signed (no Apple Developer ID yet), so macOS Gatekeeper will block it by default. Either:
-   - Right-click the app → **Open** → confirm once, **or**
-   - Run once in Terminal: `xattr -d com.apple.quarantine /Applications/Spoonlift.app`
+2. Open the DMG and drag **Spoonlift** to `Applications`.
+3. **First launch:** macOS will say *"Spoonlift can't be opened because it is from an unidentified developer."* Spoonlift isn't signed with an Apple Developer ID yet, so Gatekeeper flags it. One-time bypass:
+   - **Right-click** Spoonlift in Applications → **Open** → click **Open** in the confirmation dialog. Done. Normal double-click works forever after.
+   - Alternative Terminal one-liner: `xattr -cr /Applications/Spoonlift.app`
 
-Requires **macOS 14 Sonoma** or newer.
+Requires **macOS 14 Sonoma** or newer. Apple Developer ID signing is on the [roadmap](#-roadmap) but isn't blocking the app from running.
 
 ## 🛠 Build from source
 
