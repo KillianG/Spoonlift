@@ -1,0 +1,40 @@
+<svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Spoonlift">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7F6CEF"/>
+      <stop offset="100%" stop-color="#4636B8"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#E4DEFF"/>
+    </linearGradient>
+    <filter id="softShadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#1B0E63" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <rect x="0" y="0" width="256" height="256" rx="56" fill="url(#bg)"/>
+
+  <g filter="url(#softShadow)">
+    <rect x="50" y="54" width="72" height="100" rx="9" fill="url(#panel)"/>
+    <rect x="134" y="54" width="72" height="100" rx="9" fill="url(#panel)"/>
+  </g>
+
+  <g stroke="#4636B8" stroke-width="4" stroke-linecap="round" opacity="0.55">
+    <line x1="61" y1="78" x2="111" y2="78"/>
+    <line x1="61" y1="94" x2="103" y2="94"/>
+    <line x1="61" y1="110" x2="107" y2="110"/>
+    <line x1="61" y1="126" x2="98" y2="126"/>
+
+    <line x1="145" y1="78" x2="195" y2="78"/>
+    <line x1="145" y1="94" x2="187" y2="94"/>
+    <line x1="145" y1="110" x2="191" y2="110"/>
+    <line x1="145" y1="126" x2="182" y2="126"/>
+  </g>
+
+  <g fill="#FFC857" filter="url(#softShadow)">
+    <rect x="38" y="164" width="180" height="12" rx="6"/>
+    <rect x="122" y="176" width="12" height="26"/>
+    <ellipse cx="128" cy="212" rx="26" ry="10"/>
+  </g>
+</svg>

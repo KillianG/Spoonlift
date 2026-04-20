@@ -1,0 +1,70 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g. 0.1.0)'
+        required: true
+        default: '0.1.0'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: macos-14
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode 15
+        run: sudo xcode-select -s /Applications/Xcode_15.4.app || sudo xcode-select -s /Applications/Xcode.app
+
+      - name: Install xcodegen
+        run: brew install xcodegen
+
+      - name: Determine version
+        id: version
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "version=${{ github.event.inputs.version }}" >> "$GITHUB_OUTPUT"
+          else
+            # strip leading "v" from tag
+            REF="${GITHUB_REF_NAME}"
+            echo "version=${REF#v}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build DMG
+        run: scripts/build-release.sh "${{ steps.version.outputs.version }}"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Spoonlift-${{ steps.version.outputs.version }}.dmg
+          path: build/Spoonlift-${{ steps.version.outputs.version }}.dmg
+
+      - name: Publish release
+        if: github.event_name == 'push'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/Spoonlift-${{ steps.version.outputs.version }}.dmg
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+          body: |
+            ## Spoonlift ${{ steps.version.outputs.version }}
+
+            Native macOS file manager inspired by Forklift. Open source, MIT licensed.
+
+            ### Install
+            1. Download `Spoonlift-${{ steps.version.outputs.version }}.dmg` below.
+            2. Open it and drag Spoonlift to `Applications`.
+            3. First launch: the app is ad-hoc signed, so right-click → **Open** and confirm.
+               (Or run once from Terminal: `xattr -d com.apple.quarantine /Applications/Spoonlift.app`)
+
+            Requires macOS 14 Sonoma or newer.

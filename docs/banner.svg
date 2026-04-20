@@ -1,0 +1,46 @@
+<svg viewBox="0 0 900 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Spoonlift — macOS file manager">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2D1F80"/>
+      <stop offset="100%" stop-color="#7F6CEF"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#E4DEFF"/>
+    </linearGradient>
+    <filter id="soft" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#0F0740" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+
+  <rect x="0" y="0" width="900" height="260" rx="24" fill="url(#bg)"/>
+
+  <!-- Mini app icon on the left -->
+  <g transform="translate(48,46)">
+    <rect x="0" y="0" width="168" height="168" rx="36" fill="#FFFFFF" opacity="0.08"/>
+    <g transform="translate(16,16)" filter="url(#soft)">
+      <rect x="14" y="8" width="48" height="66" rx="6" fill="url(#panel)"/>
+      <rect x="72" y="8" width="48" height="66" rx="6" fill="url(#panel)"/>
+      <g stroke="#4636B8" stroke-width="3" stroke-linecap="round" opacity="0.55">
+        <line x1="21" y1="22" x2="55" y2="22"/>
+        <line x1="21" y1="32" x2="49" y2="32"/>
+        <line x1="21" y1="42" x2="52" y2="42"/>
+        <line x1="79" y1="22" x2="113" y2="22"/>
+        <line x1="79" y1="32" x2="107" y2="32"/>
+        <line x1="79" y1="42" x2="110" y2="42"/>
+      </g>
+      <g fill="#FFC857">
+        <rect x="4" y="82" width="128" height="9" rx="4.5"/>
+        <rect x="62" y="91" width="9" height="20"/>
+        <ellipse cx="66.5" cy="120" rx="20" ry="7"/>
+      </g>
+    </g>
+  </g>
+
+  <!-- Wordmark + tagline -->
+  <g font-family="-apple-system, SFProDisplay-Bold, Helvetica, Arial, sans-serif" fill="#FFFFFF">
+    <text x="260" y="128" font-size="84" font-weight="800" letter-spacing="-2">Spoonlift</text>
+    <text x="263" y="170" font-size="22" font-weight="500" opacity="0.82">A Forklift-inspired file manager for macOS.</text>
+    <text x="263" y="200" font-size="18" font-weight="400" opacity="0.65">Native · SwiftUI · MIT-licensed · fully open source</text>
+  </g>
+</svg>
