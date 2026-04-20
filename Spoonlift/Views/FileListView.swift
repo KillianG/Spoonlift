@@ -102,10 +102,12 @@ struct FileListView: View {
         }
         if !restorable.isEmpty {
             undoManager?.registerUndo(withTarget: tab) { t in
-                for (original, trashed) in restorable {
-                    try? FileManager.default.moveItem(at: trashed, to: original)
+                MainActor.assumeIsolated {
+                    for (original, trashed) in restorable {
+                        try? FileManager.default.moveItem(at: trashed, to: original)
+                    }
+                    t.reload()
                 }
-                t.reload()
             }
             undoManager?.setActionName("Move to Trash")
         }

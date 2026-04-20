@@ -30,15 +30,30 @@
 
 ## 📥 Install
 
+### Homebrew (recommended)
+
+```bash
+brew install --cask spoonlift
+```
+
+Homebrew handles the Gatekeeper quarantine flag automatically — no Terminal workaround, no "damaged" dialog. Just double-click Spoonlift in Applications when it finishes installing.
+
+> Until the cask is accepted into [homebrew-cask](https://github.com/Homebrew/homebrew-cask), you can install directly from this repo:
+> `brew install --cask KillianG/open-forklift/spoonlift` (after we add a tap — see [CONTRIBUTING.md](CONTRIBUTING.md#homebrew-cask)).
+
 ### Download the DMG
 
 1. Grab the latest `Spoonlift-x.y.z.dmg` from the [Releases page](../../releases/latest).
-2. Open the DMG and drag **Spoonlift** to `Applications`.
-3. **First launch:** macOS will say *"Spoonlift can't be opened because it is from an unidentified developer."* Spoonlift isn't signed with an Apple Developer ID yet, so Gatekeeper flags it. One-time bypass:
-   - **Right-click** Spoonlift in Applications → **Open** → click **Open** in the confirmation dialog. Done. Normal double-click works forever after.
-   - Alternative Terminal one-liner: `xattr -cr /Applications/Spoonlift.app`
+2. Open the DMG and drag **Spoonlift** to `Applications`. Eject the DMG.
+3. **First launch — required step** (DMG route only; brew users can skip). macOS will say *"Spoonlift is damaged and can't be opened."* It isn't damaged — Spoonlift is ad-hoc signed (no paid Apple Developer ID yet) and your browser added a quarantine flag on download, which Gatekeeper refuses to run. Clear it once in Terminal:
 
-Requires **macOS 14 Sonoma** or newer. Apple Developer ID signing is on the [roadmap](#-roadmap) but isn't blocking the app from running.
+   ```bash
+   xattr -cr /Applications/Spoonlift.app
+   ```
+
+   Then double-click Spoonlift normally. You only need to do this once per install.
+
+Requires **macOS 14 Sonoma** or newer.
 
 ## 🛠 Build from source
 

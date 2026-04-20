@@ -55,14 +55,20 @@ if [[ "${DO_SIGN}" == "1" ]]; then
         MARKETING_VERSION="${VERSION}" \
         clean build
 else
+    # Ad-hoc signing ("-") is the MINIMUM macOS requires on Apple Silicon to
+    # launch a binary at all. Truly unsigned arm64 apps are rejected by the
+    # kernel. End users will still see "Spoonlift is damaged" on first launch
+    # because of the quarantine flag added by their browser — the fix is
+    # `xattr -cr /Applications/Spoonlift.app`, documented in the README and
+    # release notes.
     xcodebuild \
         -project "${APP_NAME}.xcodeproj" \
         -scheme "${APP_NAME}" \
         -configuration Release \
         -derivedDataPath "${BUILD_DIR}/DerivedData" \
+        CODE_SIGN_IDENTITY="-" \
+        CODE_SIGN_STYLE=Manual \
         CODE_SIGNING_REQUIRED=NO \
-        CODE_SIGNING_ALLOWED=NO \
-        CODE_SIGN_IDENTITY="" \
         MARKETING_VERSION="${VERSION}" \
         clean build
 fi
@@ -78,11 +84,9 @@ if [[ "${DO_SIGN}" == "1" ]]; then
         "${APP_PATH}"
     codesign --verify --deep --strict --verbose=2 "${APP_PATH}"
 else
-    # Strip any residual ad-hoc signature Xcode may have attached, so end
-    # users get "unidentified developer" (with a right-click → Open bypass)
-    # rather than the "damaged, move to trash" dialog.
-    echo "▸ Stripping residual signatures (unsigned build)"
-    codesign --remove-signature "${APP_PATH}" 2>/dev/null || true
+    echo "▸ Re-applying ad-hoc signature (required for arm64 execution)"
+    codesign --force --deep --sign - "${APP_PATH}"
+    codesign --verify --deep --strict "${APP_PATH}" 2>&1 | head -5 || true
 fi
 
 if [[ "${DO_NOTARIZE}" == "1" ]]; then

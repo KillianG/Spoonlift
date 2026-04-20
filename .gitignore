@@ -16,6 +16,19 @@ Package.resolved
 # macOS
 .DS_Store
 
+# Signing secrets — NEVER commit these
+*.p12
+*.pfx
+*.cer
+*.certSigningRequest
+*.mobileprovision
+*.provisionprofile
+DeveloperID*
+devid*
+AuthKey_*.p8
+.env
+.env.*
+
 # Archives
 *.ipa
 *.dSYM.zip

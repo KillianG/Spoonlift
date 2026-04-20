@@ -103,6 +103,46 @@ Exporting the `.p12` from Keychain Access:
 5. `base64 -i DeveloperID.p12 | pbcopy` → paste into `APPLE_CERT_P12_BASE64`.
 6. Delete the local `.p12` when done.
 
+## Homebrew Cask
+
+Spoonlift is distributable via Homebrew so users can `brew install --cask spoonlift` instead of fighting with the Gatekeeper quarantine warning. The cask definition lives at `homebrew/spoonlift.rb` in this repo and gets mirrored into `Homebrew/homebrew-cask` whenever a release ships.
+
+### First-time submission
+
+1. Cut a stable release of Spoonlift (tag `v0.1.0` or similar; let CI publish the DMG).
+2. Run `scripts/update-cask.sh 0.1.0` — downloads the DMG, computes SHA256, rewrites `homebrew/spoonlift.rb`.
+3. Fork [Homebrew/homebrew-cask](https://github.com/Homebrew/homebrew-cask) on GitHub.
+4. Clone your fork, branch off `main`:
+   ```bash
+   git clone https://github.com/YOURUSER/homebrew-cask.git
+   cd homebrew-cask
+   git checkout -b add-spoonlift
+   ```
+5. Copy the cask file in and lint it:
+   ```bash
+   cp /path/to/open-forklift/homebrew/spoonlift.rb Casks/s/spoonlift.rb
+   brew style --fix Casks/s/spoonlift.rb
+   brew audit --new-cask spoonlift
+   ```
+6. Test the install locally:
+   ```bash
+   brew install --cask ./Casks/s/spoonlift.rb
+   open /Applications/Spoonlift.app   # should launch cleanly, no Gatekeeper warning
+   brew uninstall --cask spoonlift
+   ```
+7. Commit + push + open a PR titled `Add spoonlift v0.1.0`. The homebrew-cask maintainers will review within a few days.
+
+Once merged, anyone on any Mac can type `brew install --cask spoonlift`.
+
+### Updating for a new release
+
+Each time a new version ships:
+
+1. `scripts/update-cask.sh 0.2.0` — rewrites version + SHA256 locally.
+2. Open a PR to `Homebrew/homebrew-cask` updating `Casks/s/spoonlift.rb`. Title convention: `Update spoonlift from 0.1.0 to 0.2.0`.
+
+Homebrew's `livecheck` block in the cask tells their bot to detect new GitHub releases automatically — in practice, once the cask is merged, the bot usually opens the update PR for you within a day or two of each release, and you just approve it.
+
 ## License
 
 By contributing, you agree your contributions are licensed under the [MIT License](LICENSE).
