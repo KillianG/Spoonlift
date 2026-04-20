@@ -5,6 +5,9 @@ options:
     macOS: "14.0"
   createIntermediateGroups: true
   generateEmptyDirectories: true
+  # Pin pbxproj format so projects built by newer xcodegen remain readable by
+  # Xcode 15.x (GitHub's macos-14 runners). Xcode 15+ reads objectVersion 56.
+  objectVersion: 56
 settings:
   base:
     SWIFT_VERSION: "5.9"
