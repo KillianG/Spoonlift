@@ -130,4 +130,6 @@ if [[ "${DO_NOTARIZE}" == "1" ]]; then
 fi
 
 echo "✓ ${BUILD_DIR}/${DMG_NAME}"
-[[ "${DO_NOTARIZE}" == "1" ]] && echo "  (signed + notarized + stapled — launches cleanly on any Mac)"
+if [[ "${DO_NOTARIZE}" == "1" ]]; then
+    echo "  (signed + notarized + stapled — launches cleanly on any Mac)"
+fi
