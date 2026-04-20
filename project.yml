@@ -1,0 +1,34 @@
+name: Spoonlift
+options:
+  bundleIdPrefix: com.spoonlift
+  deploymentTarget:
+    macOS: "14.0"
+  createIntermediateGroups: true
+  generateEmptyDirectories: true
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    DEVELOPMENT_TEAM: ""
+    CODE_SIGN_STYLE: Automatic
+    CODE_SIGN_IDENTITY: "-"
+    ENABLE_HARDENED_RUNTIME: YES
+    COMBINE_HIDPI_IMAGES: YES
+targets:
+  Spoonlift:
+    type: application
+    platform: macOS
+    sources:
+      - path: Spoonlift
+        excludes:
+          - "Info.plist"
+          - "Spoonlift.entitlements"
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.spoonlift.Spoonlift
+        PRODUCT_NAME: Spoonlift
+        INFOPLIST_FILE: Spoonlift/Info.plist
+        CODE_SIGN_ENTITLEMENTS: Spoonlift/Spoonlift.entitlements
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor

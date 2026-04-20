@@ -1,0 +1,22 @@
+# xcodegen output — regenerated from project.yml
+*.xcodeproj/
+
+# Xcode
+build/
+DerivedData/
+xcuserdata/
+*.xcworkspace/
+*.xcuserstate
+
+# Swift Package Manager
+.build/
+Packages/
+Package.resolved
+
+# macOS
+.DS_Store
+
+# Archives
+*.ipa
+*.dSYM.zip
+*.dSYM
