@@ -90,22 +90,7 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md) for project layout, coding style, and h
 
 ## 📸 Screenshots
 
-<!--
-  Replace the links below with real captures once you have them.
-  Contributor guide: docs/screenshots/README.md
--->
-
-| Dual pane — light | Dual pane — dark |
-|--|--|
-| ![workspace light](docs/screenshots/workspace-light.png) | ![workspace dark](docs/screenshots/workspace-dark.png) |
-
-| Columns view | Context menu |
-|--|--|
-| ![columns](docs/screenshots/columns-view.png) | ![context menu](docs/screenshots/context-menu.png) |
-
-| Transfer with progress | Finder tags |
-|--|--|
-| ![transfer](docs/screenshots/transfer.gif) | ![tags](docs/screenshots/tags.png) |
+Coming soon. Want to help? Capture a few and open a PR — see [`docs/screenshots/README.md`](docs/screenshots/README.md) for the shot list and style guide.
 
 ## 🗺 Roadmap
 
